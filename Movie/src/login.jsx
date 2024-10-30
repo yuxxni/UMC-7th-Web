@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import useForm from '../hooks/use-form'; 
-import * as yup from 'yup';
+import { validateLogin } from '../utils/validate';
 
 const LoginContainer = styled.div`
   background-color: #131416;
@@ -19,10 +19,11 @@ const Input = styled.input`
   margin: 10px 0;
   border: 1px solid ${(props) => (props.isError ? 'red' : '#ddd')};
   border-radius: 4px;
-  width: 80%;
-  max-width: 300px;
- box-sizing: border-box;
-  transition: border 0.3s
+  width: 400px;
+  height: 50px;
+  box-sizing: border-box;
+  transition: border 0.3s;
+  display: block;
 `;
 
 const ErrorText = styled.p`
@@ -39,36 +40,19 @@ const Button = styled.button`
   border: none;
   border-radius: 4px;
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-  width: 80%;
-  max-width: 300px;
+  width: 400px;
+  height: 50px;
+  display: block;
+  margin-top:20px;
 `;
-
-
-const validationSchema = yup.object().shape({
-  email: yup.string().email('올바른 이메일 형식이 아닙니다.').required('이메일을 반드시 입력해주세요.'),
-  password: yup
-    .string()
-    .min(8, '비밀번호는 8자리 이상이어야 합니다.')
-    .max(16, '비밀번호는 16자리 이하여야 합니다.')
-    .required('비밀번호를 입력해주세요.')
-});
-
-const validate = (values) => {
-  try {
-    validationSchema.validateSync(values, { abortEarly: false });
-    return {}; 
-  } catch (err) {
-    return err.inner.reduce((acc, error) => {
-      acc[error.path] = error.message;
-      return acc;
-    }, {});
-  }
-};
 
 const Login = () => {
   const { values, errors, touched, getTextInputProps } = useForm({
-    initialValues: { email: '', password: '' },
-    validate
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validate: validateLogin,
   });
 
   const isButtonEnabled = !Object.keys(errors).length && Object.keys(touched).length > 0;
@@ -84,7 +68,7 @@ const Login = () => {
       <form onSubmit={handleSubmit}>
         <Input
           type="email"
-          placeholder="이메일"
+          placeholder="이메일을 입력해주세요."
           {...getTextInputProps('email')}
           isError={!!errors.email}
         />
@@ -92,7 +76,7 @@ const Login = () => {
 
         <Input
           type="password"
-          placeholder="비밀번호"
+          placeholder="비밀번호를 입력해주세요"
           {...getTextInputProps('password')}
           isError={!!errors.password}
         />
